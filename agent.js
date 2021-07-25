@@ -3,6 +3,7 @@ const os = require('os');
 const { networkInterfaces } = require('os');
 const publicIp = require('public-ip');
 const app = express()
+app.use(express.json());
 const { exec } = require("child_process");
 
 // Host Uptime
@@ -50,8 +51,10 @@ app.get('/agent', async function (req, res) {
     })
 })
 
-app.get('/execute', async function (req, res) {
-    exec("hostname", (error, stdout, stderr) => {
+app.post('/execute', async function (req, res) {
+    let command = req.body.command
+    console.log(command)
+    exec(command, (error, stdout, stderr) => {
         if (error) {
             console.log(`error: ${error.message}`);
             res.send(`error: ${error.message}`);
