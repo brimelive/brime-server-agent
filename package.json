@@ -1,6 +1,6 @@
 {
   "name": "brime-server-agent",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Brime's Server Config Agent",
   "main": "agent.js",
   "scripts": {
