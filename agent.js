@@ -34,6 +34,7 @@ app.get('/agent', async function (req, res) {
         "internal_ip":"",
         "host_uptime": hostUptime(),
         "host_uptime_unix": os.uptime(),
+        "network": results
   }
     })
 })
@@ -41,7 +42,7 @@ app.get('/agent', async function (req, res) {
 app.listen(3000)
 
 const nets = networkInterfaces();
-const results = Object.create(null); // Or just '{}', an empty object
+const results = {};
 
 for (const name of Object.keys(nets)) {
     for (const net of nets[name]) {
