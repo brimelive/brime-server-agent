@@ -1,17 +1,10 @@
-const AutoGitUpdate = require('auto-git-update');
 const express = require('express')
 const os = require('os');
 const { networkInterfaces } = require('os');
 const publicIp = require('public-ip');
 const app = express()
+const { exec } = require("child_process");
 
-const config = {
-    repository: 'https://github.com/brimelive/brime-server-agent',
-    tempLocation: '/tmp/',
-    ignoreFiles: ['util/config.js', 'node_modules'],
-    executeOnComplete: 'npm start agent.js',
-    exitOnComplete: true
-}
 // Host Uptime
 function hostUptime(){
     var ut_sec = os.uptime();
@@ -44,20 +37,39 @@ app.get('/agent', async function (req, res) {
         "host_uptime_unix": os.uptime(),
         "network": results,
         "agent": {
-            "version": require('./package.json').version
+            "version": require('./package.json').version,
+            uptime: Math.floor(process.uptime())
+        },
+        "services": {
+            "nginx": {
+                config_version: "",
+                uptime: "",
+            }
         }
   }
     })
 })
 
-app.get('/agent/update', function (req, res) {
-    const updater = new AutoGitUpdate(config);
-    updater.autoUpdate();
-    res.json({
-    message:"update queued"
-    })
+app.get('/execute', async function (req, res) {
+    exec("ls -la", (error, stdout, stderr) => {
+        if (error) {
+            console.log(`error: ${error.message}`);
+            res.send(`error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.log(`stderr: ${stderr}`);
+            res.send(`stderr: ${stderr}`);
+            return;
+        }
+        console.log(`stdout: ${stdout}`);
+        res.send(`stdout: ${stdout}`);
+    });
 })
- 
+
+
+
+
 app.listen(3000)
 
 const nets = networkInterfaces();
@@ -74,4 +86,5 @@ for (const name of Object.keys(nets)) {
         }
     }
 }
+
 console.log(results);
