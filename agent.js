@@ -12,7 +12,6 @@ const config = {
     executeOnComplete: 'npm start agent.js',
     exitOnComplete: true
 }
-const updater = new AutoGitUpdate(config);
 // Host Uptime
 function hostUptime(){
     var ut_sec = os.uptime();
@@ -52,6 +51,7 @@ app.get('/agent', async function (req, res) {
 })
 
 app.get('/agent/update', function (req, res) {
+    const updater = new AutoGitUpdate(config);
     updater.autoUpdate();
     res.json({
     message:"update queued"
