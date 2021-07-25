@@ -7,7 +7,7 @@ app.use(express.json());
 const { exec } = require("child_process");
 const fs = require('fs')
 
-fs.readFile('brime.json', 'utf8' , (err, data) => {
+fs.readFile('brime-services.json', 'utf8' , (err, data) => {
     if (err) {
       console.error(err)
       return
