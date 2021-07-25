@@ -69,12 +69,5 @@ function restartService(service) {
   }
 }
 
-function brimeNginxConfigVersion(){
-    fs.readFile('/etc/nginx/brime-config-version.json', 'utf8' , (err, data) => {
-        if (err) {
-          console.error(err.Error)
-          return err.Error
-        }
-        return data
-      })
-}
+var nginxConfigRead = fs.readFileSync('./brime-config-version.json','utf8');
+var nginxConfigV = JSON.parse(nginxConfigRead).version

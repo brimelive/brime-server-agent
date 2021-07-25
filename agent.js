@@ -10,13 +10,6 @@ const axios = require('axios');
 var git = require( 'git-rev-sync' );
 // file is included here:
 eval(fs.readFileSync('functions.js')+'');
-fs.readFile('brime-services.json', 'utf8' , (err, data) => {
-    if (err) {
-      console.error(err)
-      return
-    }
-    console.log(data)
-  })
  
 
 // Public IP
@@ -43,7 +36,7 @@ app.get('/agent', async function (req, res) {
         "network-interfaces": results,
         "services": {
             "nginx": {
-                config_version: brimeNginxConfigVersion() ?? "config-not-found",
+                config_version: nginxConfigV,
                 stats: await nginxUptime()
             }
         }
