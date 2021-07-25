@@ -8,18 +8,22 @@ const { exec } = require("child_process");
 const fs = require('fs')
 const axios = require('axios');
 var git = require( 'git-rev-sync' );
-// file is included here:
+require('dotenv').config()
 eval(fs.readFileSync('functions.js')+'');
- 
 
-// Public IP
-async function hostPublicIP() {
-    return await publicIp.v4()
-};
+var db = require("node-localdb");
+var services = db("/db/services.json");
 
-const agent_id = os.hostname();
+// services.insert({ "services": ["nginx"] })
+//   .then(function(u) {
+//     console.log(u); // print user, with a auto generate uuid
+//   });
+
+
 app.get('/agent', async function (req, res) {
     console.log(await nginxUptime())
+    let serviceLookup = services.find({})
+    let lServices = await serviceLookup
   res.json({
     "brime-agent": {
         "version": require('./package.json').version,
@@ -29,18 +33,20 @@ app.get('/agent', async function (req, res) {
     },
       "host": {
         "hostname": os.hostname(),
-        "external_ip": await hostPublicIP(),
-        "internal_ip":"",
-        "host_uptime": hostUptime(),
-        "host_uptime_unix": os.uptime(),
+        "external_ip": [await hostPublicIP()],
+        "internal_ip": await results[Object.keys(results)[0]][0],
         "network-interfaces": results,
+        "host_uptime": hostUptime(),
+        "host_uptime_unix": os.uptime()
+    },
         "services": {
+            "list": lServices[0].services,
             "nginx": {
                 config_version: nginxConfigV,
                 stats: await nginxUptime()
             }
         }
-  }
+  
     })
 })
 
@@ -48,8 +54,6 @@ app.get('/agent', async function (req, res) {
 
 
 
-
-app.listen(3000)
 
 
 
@@ -71,71 +75,8 @@ for (const name of Object.keys(nets)) {
 console.log(results);
 
 
-var mqtt = require('mqtt')
-const clientId = os.hostname()
 
-const host = 'ws://129.213.48.167:8083/mqtt'
-
-const options = {
-  username: clientId,
-  keepalive: 60,
-  clientId: clientId,
-  protocolId: 'MQTT',
-  protocolVersion: 4,
-  clean: true,
-  reconnectPeriod: 1000,
-  connectTimeout: 30 * 1000,
-  will: {
-    topic: 'WillMsg',
-    payload: 'Connection Closed abnormally..!',
-    qos: 0,
-    retain: false
-  },
-}
-console.log('Connecting mqtt client')
-const client = mqtt.connect(host, options)
-
-client.on('error', (err) => {
-  console.log('Connection error: ', err)
-  client.end()
-})
-
-client.on('reconnect', () => {
-  console.log('Reconnecting...')
-})
-
-client.on('connect', () => {
-    console.log('Client connected:' + clientId)
-    // Subscribe
-    client.subscribe('agent', { qos: 0 })
-    client.subscribe('execute', { qos: 0 })
-    client.subscribe('restart', { qos: 0 })
-  })
-function execute(command){
-  console.log(command)
-  exec(command, (error, stdout, stderr) => {
-      if (error) {
-          console.log(`error: ${error.message.toString()}`);
-          client.publish('logs', error.message.toString(), { qos: 0, retain: false })
-      }
-      if (stderr) {
-        console.log(`stdout: ${stdout.toString()}`);
-      }
-      console.log(`stdout: ${stdout.toString()}`);
-      client.publish('logs', stdout.toString(), { qos: 0, retain: false })
-  });
-}
-  client.on('message', (topic, message, packet) => {
-    if (topic === 'execute') {
-    let msg = JSON.parse(message.toString())
-    console.log(msg.command)
-    execute(msg.command)
-    }
-    if (topic === 'restart') {
-        let msg = JSON.parse(message.toString())
-        restartService(msg.service)
-        }
-  })
-
+eval(fs.readFileSync('./websocket.js')+'');
   
 
+  app.listen(3000)

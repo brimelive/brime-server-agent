@@ -1,3 +1,10 @@
+// Public IP
+async function hostPublicIP() {
+    return await publicIp.v4()
+};
+
+const agent_id = os.hostname();
+
 // Host Uptime
 function hostUptime() {
   var ut_sec = os.uptime();
@@ -23,7 +30,7 @@ async function nginxUptime() {
     let streams = `${data.servers[0].applications[0].live.nclients / 3}` ?? "null";
     let nginxMsg = {}
     nginxMsg.uptime = uptime;
-    nginxMsg.streams = streams;
+    nginxMsg.ingest_streams = streams;
     return nginxMsg;
   } catch (error) {
     console.error(error);
