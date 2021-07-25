@@ -36,7 +36,7 @@ async function hostPublicIP() {
     return await publicIp.v4()
 };
 
- 
+const agent_id = os.hostname();
 app.get('/agent', async function (req, res) {
   res.json({
       "host": {
@@ -149,7 +149,6 @@ function execute(command){
     }
     if (topic === 'restart') {
         let msg = JSON.parse(message.toString())
-        console.log(msg)
         restartService(msg.service)
         }
   })
@@ -171,11 +170,22 @@ function execute(command){
               console.log(`stdout: ${stdout.toString()}`);
             }
             console.log(`stdout: ${stdout.toString()}`);
+            let msg = `
+        {
+            "agent_id": "${agent_id}",
+            "success": ""
+            "timstamp": "${new Date().getTime()}"
+        }`
             client.publish('logs', stdout.toString(), { qos: 0, retain: false })
         });
     } else {
         // Call to Service not allowed
-        let msg = `Call to Service ${service} not allowed`
+        let msg = `
+        {
+            "agent_id": "${agent_id}",
+            "error": "Call to service ${service} not allowed"
+            "timstamp": "${new Date().getTime()}"
+        }`
         console.log(msg)
         client.publish('logs', msg, { qos: 0, retain: false })
     }
