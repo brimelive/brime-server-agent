@@ -11,6 +11,8 @@
   "dependencies": {
     "auto-git-update": "^2.0.1",
     "express": "^4.17.1",
-    "public-ip": "^4.0.4"
+    "mqtt": "^4.2.8",
+    "public-ip": "^4.0.4",
+    "socket.io-client": "^4.1.3"
   }
 }
