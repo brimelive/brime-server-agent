@@ -1,9 +1,18 @@
+const AutoGitUpdate = require('auto-git-update');
 const express = require('express')
 const os = require('os');
 const { networkInterfaces } = require('os');
 const publicIp = require('public-ip');
 const app = express()
 
+const config = {
+    repository: 'https://github.com/brimelive/brime-server-agent',
+    tempLocation: '/tmp/',
+    ignoreFiles: ['util/config.js'],
+    executeOnComplete: 'npm start agent.js',
+    exitOnComplete: true
+}
+const updater = new AutoGitUpdate(config);
 // Host Uptime
 function hostUptime(){
     var ut_sec = os.uptime();
@@ -34,9 +43,16 @@ app.get('/agent', async function (req, res) {
         "internal_ip":"",
         "host_uptime": hostUptime(),
         "host_uptime_unix": os.uptime(),
-        "network": results
+        "network": results,
+        "agent": {
+            "version": require('./package.json').version
+        }
   }
     })
+})
+
+app.get('/agent/update', function (req, res) {
+    updater.autoUpdate();
 })
  
 app.listen(3000)

@@ -1,6 +1,6 @@
 {
   "name": "brime-server-agent",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Brime's Server Config Agent",
   "main": "agent.js",
   "scripts": {
@@ -9,6 +9,7 @@
   "author": "BRIME",
   "license": "ISC",
   "dependencies": {
+    "auto-git-update": "^2.0.1",
     "express": "^4.17.1",
     "public-ip": "^4.0.4"
   }
