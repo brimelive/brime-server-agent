@@ -29,7 +29,7 @@ async function hostPublicIP() {
 app.get('/agent', async function (req, res) {
   res.json({
       "host": {
-        "hostname":'ingest-us-ashburn-001.brime.tv',
+        "hostname": os.hostname(),
         "external_ip": await hostPublicIP(),
         "internal_ip":"",
         "host_uptime": hostUptime(),
