@@ -125,6 +125,7 @@ client.on('connect', () => {
     // Subscribe
     client.subscribe('agent', { qos: 0 })
     client.subscribe('execute', { qos: 0 })
+    client.subscribe('restart', { qos: 0 })
   })
 function execute(command){
   console.log(command)
@@ -146,4 +147,37 @@ function execute(command){
     console.log(msg.command)
     execute(msg.command)
     }
+    if (topic === 'restart') {
+        let msg = JSON.parse(message.toString())
+        console.log(msg)
+        restartService(msg)
+        }
   })
+
+  function restartService(service){
+    const allowedServices = [
+        'nginx',
+        'nimble',
+        'rsyslog'
+    ]
+    if (allowedServices.indexOf(service) > -1) {
+        // Allowed Service Call
+        exec(`service ${service} restart`, (error, stdout, stderr) => {
+            if (error) {
+                console.log(`error: ${error.message.toString()}`);
+                client.publish('logs', error.message.toString(), { qos: 0, retain: false })
+            }
+            if (stderr) {
+              console.log(`stdout: ${stdout.toString()}`);
+            }
+            console.log(`stdout: ${stdout.toString()}`);
+            client.publish('logs', stdout.toString(), { qos: 0, retain: false })
+        });
+    } else {
+        // Call to Service not allowed
+        let msg = `Call to Service ${service} not allowed`
+        console.log(msg)
+        client.publish('logs', msg, { qos: 0, retain: false })
+    }
+    
+  }
