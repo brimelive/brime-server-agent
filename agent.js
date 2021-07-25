@@ -8,7 +8,7 @@ const app = express()
 const config = {
     repository: 'https://github.com/brimelive/brime-server-agent',
     tempLocation: '/tmp/',
-    ignoreFiles: ['util/config.js'],
+    ignoreFiles: ['util/config.js', 'node_modules'],
     executeOnComplete: 'npm start agent.js',
     exitOnComplete: true
 }
