@@ -1,0 +1,15 @@
+{
+  "name": "brime-server-agent",
+  "version": "1.0.0",
+  "description": "Brime's Server Config Agent",
+  "main": "agent.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "BRIME",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "public-ip": "^4.0.4"
+  }
+}
