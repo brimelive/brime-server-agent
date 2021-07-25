@@ -51,7 +51,7 @@ app.get('/agent', async function (req, res) {
 })
 
 app.get('/execute', async function (req, res) {
-    exec("ls -la", (error, stdout, stderr) => {
+    exec("hostname", (error, stdout, stderr) => {
         if (error) {
             console.log(`error: ${error.message}`);
             res.send(`error: ${error.message}`);
