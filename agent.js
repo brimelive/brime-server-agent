@@ -21,7 +21,6 @@ var services = db("/db/services.json");
 
 
 app.get('/agent', async function (req, res) {
-    console.log(await nginxUptime())
     let serviceLookup = services.find({})
     let lServices = await serviceLookup
   res.json({

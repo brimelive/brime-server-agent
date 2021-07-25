@@ -71,7 +71,6 @@ function restartService(service) {
             "error": "Call to service ${service} not allowed"
             "timstamp": "${new Date().getTime()}"
         }`;
-    console.log(msg);
     client.publish("logs", msg, { qos: 0, retain: false });
   }
 }

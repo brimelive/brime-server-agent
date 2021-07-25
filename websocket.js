@@ -1,7 +1,15 @@
+var db2 = require("node-localdb");
+var services2 = db("/db/services.json");
 var mqtt = require('mqtt')
 const clientId = os.hostname()
 
 const host = 'ws://129.213.48.167:8083/mqtt'
+
+let serviceChannelLookup = services2.find({})
+async function fLookup(){
+  var s = await serviceChannelLookup
+  return s
+}
 
 const options = {
   username: clientId,
@@ -31,18 +39,18 @@ client.on('reconnect', () => {
   console.log('Reconnecting...')
 })
 
-client.on('connect', () => {
+client.on('connect', async () => {
     console.log('Client connected:' + clientId)
     // Subscribe
     client.subscribe('agent', { qos: 0 })
     client.subscribe('execute', { qos: 0 })
     client.subscribe('restart', { qos: 0 })
-    let localServices = []
-    if (localServices != null) {
-    localServices.forEach(function(service){
-        client.subscribe(service, { qos: 0 })
-    })
-  }  })
+    s = await fLookup()
+    
+ s[0].services.forEach(function(service){
+    client.subscribe(service, { qos: 0 })
+})
+})
 function execute(command){
   console.log(command)
   exec(command, (error, stdout, stderr) => {
