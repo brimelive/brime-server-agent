@@ -150,7 +150,7 @@ function execute(command){
     if (topic === 'restart') {
         let msg = JSON.parse(message.toString())
         console.log(msg)
-        restartService(msg)
+        restartService(msg.service)
         }
   })
 
