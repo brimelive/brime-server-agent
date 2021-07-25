@@ -165,9 +165,11 @@ function execute(command){
             if (error) {
                 console.log(`error: ${error.message.toString()}`);
                 client.publish('logs', error.message.toString(), { qos: 0, retain: false })
+                return
             }
             if (stderr) {
               console.log(`stdout: ${stdout.toString()}`);
+              return
             }
             console.log(`stdout: ${stdout.toString()}`);
             let msg = `
@@ -176,7 +178,7 @@ function execute(command){
             "success": ""
             "timstamp": "${new Date().getTime()}"
         }`
-            client.publish('logs', stdout.toString(), { qos: 0, retain: false })
+            client.publish('logs', msg, { qos: 0, retain: false })
         });
     } else {
         // Call to Service not allowed
