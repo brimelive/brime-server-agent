@@ -6,6 +6,7 @@ const app = express()
 app.use(express.json());
 const { exec } = require("child_process");
 const fs = require('fs')
+const axios = require('axios');
 
 fs.readFile('brime-services.json', 'utf8' , (err, data) => {
     if (err) {
@@ -53,7 +54,7 @@ app.get('/agent', async function (req, res) {
         "services": {
             "nginx": {
                 config_version: "",
-                uptime: "",
+                uptime: await nginxUptime(),
             }
         }
   }
@@ -192,4 +193,15 @@ function execute(command){
         client.publish('logs', msg, { qos: 0, retain: false })
     }
     
+  }
+
+async function nginxUptime() {
+    try {
+      const response = await axios.get('http://localhost/stat');
+      let uptime = response.data["http-flv"].uptime
+    console.log(uptime.toString());
+    return uptime.toString();
+    } catch (error) {
+      console.error(error);
+    }
   }

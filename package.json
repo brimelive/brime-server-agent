@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "auto-git-update": "^2.0.1",
+    "axios": "^0.21.1",
     "express": "^4.17.1",
     "mqtt": "^4.2.8",
     "public-ip": "^4.0.4",
