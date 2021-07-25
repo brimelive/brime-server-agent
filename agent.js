@@ -53,6 +53,9 @@ app.get('/agent', async function (req, res) {
 
 app.get('/agent/update', function (req, res) {
     updater.autoUpdate();
+    res.json({
+    message:"update queued"
+    })
 })
  
 app.listen(3000)
