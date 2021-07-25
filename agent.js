@@ -5,8 +5,15 @@ const publicIp = require('public-ip');
 const app = express()
 app.use(express.json());
 const { exec } = require("child_process");
+const fs = require('fs')
 
-
+fs.readFile('brime.json', 'utf8' , (err, data) => {
+    if (err) {
+      console.error(err)
+      return
+    }
+    console.log(data)
+  })
 
 // Host Uptime
 function hostUptime(){
