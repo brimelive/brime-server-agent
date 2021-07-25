@@ -130,6 +130,7 @@ function execute(command){
         console.log(`stdout: ${stdout.toString()}`);
       }
       console.log(`stdout: ${stdout.toString()}`);
+      client.publish('logs', stdout.toString(), { qos: 0, retain: false })
   });
 }
   client.on('message', (topic, message, packet) => {
