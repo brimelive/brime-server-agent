@@ -7,7 +7,9 @@ app.use(express.json());
 const { exec } = require("child_process");
 const fs = require('fs')
 const axios = require('axios');
-
+var git = require( 'git-rev-sync' );
+// file is included here:
+eval(fs.readFileSync('functions.js')+'');
 fs.readFile('brime-services.json', 'utf8' , (err, data) => {
     if (err) {
       console.error(err)
@@ -15,22 +17,7 @@ fs.readFile('brime-services.json', 'utf8' , (err, data) => {
     }
     console.log(data)
   })
-
-// Host Uptime
-function hostUptime(){
-    var ut_sec = os.uptime();
-    var ut_min = ut_sec/60;
-    var ut_hour = ut_min/60;
-       
-    ut_sec = Math.floor(ut_sec);
-    ut_min = Math.floor(ut_min);
-    ut_hour = Math.floor(ut_hour);
-      
-    ut_hour = ut_hour%60;
-    ut_min = ut_min%60;
-    ut_sec = ut_sec%60;
-    return `${ut_hour} Hour(s) ${ut_min} Minute(s) ${ut_sec} Second(s)`
-}
+ 
 
 // Public IP
 async function hostPublicIP() {
@@ -39,22 +26,25 @@ async function hostPublicIP() {
 
 const agent_id = os.hostname();
 app.get('/agent', async function (req, res) {
+    console.log(await nginxUptime())
   res.json({
+    "brime-agent": {
+        "version": require('./package.json').version,
+        "git-commit-hash": git.short(),
+        "git-commit-url": `https://github.com/brimelive/brime-server-agent/commit/${git.short()}`,
+        "uptime": Math.floor(process.uptime())
+    },
       "host": {
         "hostname": os.hostname(),
         "external_ip": await hostPublicIP(),
         "internal_ip":"",
         "host_uptime": hostUptime(),
         "host_uptime_unix": os.uptime(),
-        "network": results,
-        "agent": {
-            "version": require('./package.json').version,
-            uptime: Math.floor(process.uptime())
-        },
+        "network-interfaces": results,
         "services": {
             "nginx": {
-                config_version: "",
-                uptime: await nginxUptime(),
+                config_version: brimeNginxConfigVersion() ?? "config-not-found",
+                stats: await nginxUptime()
             }
         }
   }
@@ -154,54 +144,5 @@ function execute(command){
         }
   })
 
-  function restartService(service){
-    const allowedServices = [
-        'nginx',
-        'nimble',
-        'rsyslog'
-    ]
-    if (allowedServices.indexOf(service) > -1) {
-        // Allowed Service Call
-        exec(`service ${service} restart`, (error, stdout, stderr) => {
-            if (error) {
-                console.log(`error: ${error.message.toString()}`);
-                client.publish('logs', error.message.toString(), { qos: 0, retain: false })
-                return
-            }
-            if (stderr) {
-              console.log(`stdout: ${stdout.toString()}`);
-              return
-            }
-            console.log(`stdout: ${stdout.toString()}`);
-            let msg = `
-        {
-            "agent_id": "${agent_id}",
-            "success": ""
-            "timstamp": "${new Date().getTime()}"
-        }`
-            client.publish('logs', msg, { qos: 0, retain: false })
-        });
-    } else {
-        // Call to Service not allowed
-        let msg = `
-        {
-            "agent_id": "${agent_id}",
-            "error": "Call to service ${service} not allowed"
-            "timstamp": "${new Date().getTime()}"
-        }`
-        console.log(msg)
-        client.publish('logs', msg, { qos: 0, retain: false })
-    }
-    
-  }
+  
 
-async function nginxUptime() {
-    try {
-      const response = await axios.get('http://localhost/stat');
-      let uptime = response.data["http-flv"].uptime
-    console.log(uptime.toString());
-    return uptime.toString();
-    } catch (error) {
-      console.error(error);
-    }
-  }
